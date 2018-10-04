@@ -29,81 +29,117 @@ var currentWord; //Where we store the word currently being guessed
 
 var guessingWord = []; //Stores properly guessed letters
 
-var remainingGuesses = 0;
+var remainingGuesses = 10; 
 
-var gameStarted 
+var gameOver = false;
 
-var hasFinished = false;
+var gameStarted = false;
 
 var wins = 0;
 
 var currentWordDiv;
 
+currentWord = Math.floor(Math.random() * (selectableWords.length));
 
 //Functions
 
 
 
-///Select a random word for use
-function selectWord(){
-    currentWord = selectableWords[Math.floor(Math.random()*selectableWords.length)];
-    currentWordDiv = document.getElementById("currentWord");
-    console.log(currentWord);
-}; //Put this inside of reset game function below
 
 //Reset game
 function resetGame(){
      remainingGuesses = maxTries;
-     gameStarted = false;
-     hasFinished = false;
+     gameOver = false;
      wins = 0;
      guessedLetters = [];
      guessingWord = [];
      currentWord = Math.floor(Math.random() * (selectableWords.length));
-     currentWordDiv = document.getElementById("currentWord");
-     console.log(currentWord);
-     console.log(currentWord.length);
+     for (var i = 0; i < selectableWords[currentWord].length; i++) {
+    guessingWord.push("_");
+     };
+    writeDisplay();
 };
 
-//Hit key to start game/select word/populate underscores
+//Updates the display after guessing a letter
+function writeDisplay(){
+    document.getElementById("totalWins").innerText = wins;
+    document.getElementById("currentWord").innerText = "";
+    for (var i = 0; i < guessingWord.length; i++) {
+        document.getElementById("currentWord").innerText += guessingWord[i];
+    }
+    document.getElementById("remainingGuesses").innerText = remainingGuesses;
+    document.getElementById("guessedLetters").innerText = guessedLetters;
+    if(remainingGuesses <=0){
+        hasFinished= true;
+    }
+};
+
+//If gameOver, start new game on keydown. If game not over, use alphabetic key to trigger guessLetter function.
 document.addEventListener('keydown', function() {
+   if(gameOver){
     resetGame();
-    currentWordDiv.innerHTML = guessingWord;
-    gameStarted = true;
-    });
-    
-
-
-
-
-
-//Create underscores to display based on length of word being guessed
-function createUnderScores(currentWord, currentWordDiv){
-    for(var i=0; i < currentWord.length; i++){
-        currentWordDiv.innerHTML = underScore[i];
-    }
-};
-
-document.addEventListener('keydown', function(){
-
-    currentWordDiv = document.getElementById("currentWord");
-
-    if(gameStarted = true){
-        var keyName = event.key;
-        currentWordDiv.innerHTML= keyName;
-    }
+    gameOver = false;
+   }
+   else {
+    if(event.keyCode >= 65 && event.keyCode <= 90) {
+        guessLetter(event.key.toLowerCase());
+   }};
 });
 
-//Register letters when guessed correctly and display
+function guessLetter(letter){
+    if(remainingGuesses > 0);
+    if (!gameStarted) {
+        gameStarted = true;
+    };
 
-//Keep track of letters guessed incorrectly and display
+    if (guessedLetters.indexOf(letter) === -1) {
+        guessedLetters.push(letter);
+        checkGuess(letter);
+}
+    writeDisplay();
+    checkWin();
+};
 
 
-//Register a win when all correct letters are guessed
+function checkGuess(letter){
+    
+    
+    //Store positions of letters in string
+    var positions = [];
 
-//Count wins
 
-//New word when word is guessed
+
+    //find all instances of guessed letter and store in above array
+    for (var i = 0; i < selectableWords[currentWord].length; i++) {
+        if(selectableWords[currentWord][i] === letter) {
+            positions.push(i);
+        }
+    }
+   
+
+    //remove guess if wrong
+    if (positions.length <= 0) {
+        remainingGuesses--;
+        document.getElementById("remainingGuesses").innertext = remainingGuesses;
+
+    } else {
+        // Replace underscores with letter based on positionsarray
+        for(var i = 0; i < positions.length; i++) {
+            guessingWord[positions[i]] = letter;
+        }
+    }
+};
+
+
+
+//Record wins
+function checkWin() {
+    if(guessingWord.indexOf("_") === -1) {
+        wins++;
+        //Need to write to wins div here
+        hasFinished = true;
+    }
+};
 
 
 
