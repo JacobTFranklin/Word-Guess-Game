@@ -4,20 +4,20 @@
 var selectableWords =  //Word list
 [
     "birdie",
-    "clubtwirl",
-    "sexaddiction",
-    "perkins",
-    "masters",
-    "majors",
-    "spine",
-    "eldrick",
-    "stinger",
-    "eagle",
-    "nike",
-    "chipin",
-    "jupiter",
-    "bridgestone",
-    "goat",
+    // "clubtwirl",
+    // "sexaddiction",
+    // "perkins",
+    // "masters",
+    // "majors",
+    // "spine",
+    // "eldrick",
+    // "stinger",
+    // "eagle",
+    // "nike",
+    // "chipin",
+    // "jupiter",
+    // "bridgestone",
+    // //"goat",
 ]
 
 
@@ -31,9 +31,11 @@ var guessingWord = []; //Stores properly guessed letters
 
 var remainingGuesses = 10; 
 
-var gameOver = false;
+var gameOver = true;
 
 var gameStarted = false;
+
+var matchFinished = false;
 
 var wins = 0;
 
@@ -48,17 +50,22 @@ currentWord = Math.floor(Math.random() * (selectableWords.length));
 
 //Reset game
 function resetGame(){
-     remainingGuesses = maxTries;
      gameOver = false;
      wins = 0;
-     guessedLetters = [];
-     guessingWord = [];
-     currentWord = Math.floor(Math.random() * (selectableWords.length));
-     for (var i = 0; i < selectableWords[currentWord].length; i++) {
-    guessingWord.push("_");
-     };
-    writeDisplay();
+     resetMatch();
 };
+
+// reset match
+function resetMatch(){
+    remainingGuesses = maxTries;
+    guessedLetters = [];
+    guessingWord = [];
+    currentWord = Math.floor(Math.random() * (selectableWords.length));
+    for (var i = 0; i < selectableWords[currentWord].length; i++) {
+        guessingWord.push(" _ ");
+    };
+    writeDisplay();
+}
 
 //Updates the display after guessing a letter
 function writeDisplay(){
@@ -70,20 +77,25 @@ function writeDisplay(){
     document.getElementById("remainingGuesses").innerText = remainingGuesses;
     document.getElementById("guessedLetters").innerText = guessedLetters;
     if(remainingGuesses <=0){
-        hasFinished= true;
+        // when you run out of guesses a match of hangman has finished
+        matchFinished= true;
     }
 };
 
 //If gameOver, start new game on keydown. If game not over, use alphabetic key to trigger guessLetter function.
 document.addEventListener('keydown', function() {
    if(gameOver){
+    // start of game
     resetGame();
     gameOver = false;
-   }
-   else {
-    if(event.keyCode >= 65 && event.keyCode <= 90) {
-        guessLetter(event.key.toLowerCase());
-   }};
+   } else if (!matchFinished) {
+        if(event.keyCode >= 65 && event.keyCode <= 90) {
+            guessLetter(event.key.toLowerCase());
+        };
+    } else if (matchFinished) {
+        resetMatch();
+        matchFinished = false;
+    }
 });
 
 function guessLetter(letter){
@@ -102,8 +114,6 @@ function guessLetter(letter){
 
 
 function checkGuess(letter){
-    
-    
     //Store positions of letters in string
     var positions = [];
 
@@ -134,10 +144,11 @@ function checkGuess(letter){
 
 //Record wins
 function checkWin() {
-    if(guessingWord.indexOf("_") === -1) {
+    if(guessingWord.indexOf(" _ ") === -1) {
         wins++;
         //Need to write to wins div here
-        hasFinished = true;
+        // enf of a hangman match
+        matchFinished = true;
     }
 };
 
